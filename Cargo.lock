@@ -783,7 +783,9 @@ version = "0.1.0"
 dependencies = [
  "async-retry",
  "reqwest",
+ "retry-policy",
  "serde",
+ "serde_json",
  "tokio",
 ]
 
