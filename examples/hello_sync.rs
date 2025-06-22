@@ -1,26 +1,31 @@
-use rust_llm::{Client, ClientApi, AsyncClientApi, Message};
+use rust_llm::{Client, ClientApi, Message};
 
-#[tokio::main]
-async fn main() {
+fn main() {
     // 确保已设置环境变量 DEESEEK_API_KEY
     let client = Client::new("deepseek-chat".to_string())
         .with_max_tokens(1000)
         .with_temperature(0.7);
 
-    // 异步方式调用单条消息
-    println!("=== 异步单条消息示例 ===");
-    match client.send_message("你好，请介绍一下你自己".to_string()).await {
+    // 同步调用单条消息
+    println!("=== 同步单条消息示例 ===");
+    let dialog = vec![
+        Message {
+            role: "user".to_string(),
+            content: "你好，请介绍一下你自己".to_string(),
+        }
+    ];
+    match client.response(dialog) {
         Ok(response) => {
-            // 异步接口内部会打印 Raw async response JSON
+            // response 内部会打印 Raw response JSON
             println!("Parsed content: {}", response);
         }
         Err(e) => {
-            eprintln!("异步调用错误: {}", e);
+            eprintln!("同步调用错误: {}", e);
         }
     }
 
-    // 异步发送完整对话
-    println!("=== 异步对话示例 ===");
+    // 同步对话
+    println!("=== 同步对话示例 ===");
     let conversation = vec![
         Message {
             role: "user".to_string(),
@@ -35,13 +40,12 @@ async fn main() {
             content: "你能做什么？".to_string(),
         }
     ];
-
-    match client.send_conversation(conversation).await {
+    match client.response(conversation) {
         Ok(response) => {
             println!("Parsed content: {}", response);
         }
         Err(e) => {
-            eprintln!("对话调用错误: {}", e);
+            eprintln!("同步对话错误: {}", e);
         }
     }
 }
