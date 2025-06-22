@@ -1,21 +1,15 @@
 mod config;
 mod api;
 
-use api::*;
+use config::{DEFAULT_MODEL, DEFAULT_MAX_TOKENS, DEFAULT_TEMPERATURE, BASE_DELAY, MAX_RETRIES};
+use api::{ModelApi, ApiError};
 // use std::collections::VecDeque;
 
-// 重新导出常用的类型
-pub use api::{Message, ModelRequest, ApiError};
-
-pub type ClientResponse = String;
+use api::{Message, DeepseekModel};
 
 pub trait ClientApi {
-    fn response(&self, dialog: Vec<Message>) -> Result<ClientResponse, String>;
+    fn response(&self, dialog: &[Message]) -> Result<Option<Message>, ApiError>;
 }
-
-// pub trait AsyncClientApi {
-//     async fn response_async(&self, dialog: Vec<Message>) -> Result<ClientResponse, String>;
-// }
 
 // 对话历史记录
 #[derive(Debug, Clone)]
@@ -26,12 +20,12 @@ impl Conversation {
         Self(Vec::new())
     }
 
-    pub fn add_message(&mut self, role: String, content: String) {
-        self.0.push(Message { role, content });
+    pub fn add_message(&mut self, message: Message) {
+        self.0.push(message);
     }
 
-    pub fn get_messages(&self) -> Vec<Message> {
-        self.0.iter().cloned().collect()
+    pub fn get_messages(&self) -> &[Message] {
+        &self.0
     }
 
     pub fn clear(&mut self) {
@@ -39,121 +33,74 @@ impl Conversation {
     }
 }
 
-// 主要的客户端结构体
-pub struct Communicate;
-
-impl Communicate {
-//     pub fn new() -> Self {
-//         Self {}
-//     }
-
-//     pub fn with_max_tokens(mut self, max_tokens: u32) -> Self {
-//         self.max_tokens = Some(max_tokens);
-//         self
-//     }
-
-//     pub fn with_temperature(mut self, temperature: f32) -> Self {
-//         self.temperature = Some(temperature);
-//         self
-//     }
-
-//     // 解析API响应
-//     fn parse_response(&self, response: &str) -> Result<String, String> {
-//         // 尝试解析JSON响应
-//         match serde_json::from_str::<serde_json::Value>(response) {
-//             Ok(json) => {
-//                 // 提取choices[0].message.content
-//                 if let Some(choices) = json.get("choices") {
-//                     if let Some(choice) = choices[0].as_object() {
-//                         if let Some(message) = choice.get("message") {
-//                             if let Some(content) = message.get("content") {
-//                                 if let Some(content_str) = content.as_str() {
-//                                     return Ok(content_str.to_string());
-//                                 }
-//                             }
-//                         }
-//                     }
-//                 }
-//                 Err("无法解析响应内容".to_string())
-//             }
-//             Err(_) => {
-//                 // 如果不是JSON，直接返回原始响应
-//                 Ok(response.to_string())
-//             }
-//         }
-//     }
-
-//     // 异步发送消息
-//     pub async fn send_message(&self, message: String) -> Result<String, String> {
-//         let dialog = vec![
-//             Message {
-//                 role: "user".to_string(),
-//                 content: message,
-//             }
-//         ];
-//         self.response_async(dialog).await
-//     }
-
-//     // 异步发送对话
-//     pub async fn send_conversation(&self, messages: Vec<Message>) -> Result<String, String> {
-//         self.response_async(messages).await
-//     }
-
-//     // 构建请求
-//     fn build_request(&self, messages: Vec<Message>) -> ModelRequest {
-//         ModelRequest {
-//             model: self.model_name.clone(),
-//             messages,
-//             max_tokens: self.max_tokens,
-//             temperature: self.temperature,
-//         }
-//     }
-// }
-
-// impl ClientApi for Client {
-//     fn response(&self, dialog: Vec<Message>) -> Result<ClientResponse, String> {
-//         // 构建请求
-//         let request = self.build_request(dialog);
-
-//         // 调用API
-//         match self.model.chat(request) {
-//             Ok(response) => self.parse_response(&response),
-//             Err(e) => Err(format!("API调用失败: {:?}", e)),
-//         }
-//     }
-// }
-
-// impl AsyncClientApi for Client {
-//     async fn response_async(&self, dialog: Vec<Message>) -> Result<ClientResponse, String> {
-//         // 使用tokio::task::spawn_blocking来异步执行同步代码
-//         let request = self.build_request(dialog);
-        
-//         tokio::task::spawn_blocking(move || {
-//             // 这里需要重新创建model实例，因为self不能传递
-//             let model = DeepseekModel::new();
-//             model.chat(request)
-//         }).await.map_err(|e| format!("任务执行失败: {:?}", e))?
-//         .map_err(|e| format!("API调用失败: {:?}", e))
-//         .and_then(|response_text| {
-//             // 解析响应
-//             match serde_json::from_str::<serde_json::Value>(&response_text) {
-//                 Ok(json) => {
-//                     if let Some(choices) = json.get("choices") {
-//                         if let Some(choice) = choices[0].as_object() {
-//                             if let Some(message) = choice.get("message") {
-//                                 if let Some(content) = message.get("content") {
-//                                     if let Some(content_str) = content.as_str() {
-//                                         return Ok(content_str.to_string());
-//                                     }
-//                                 }
-//                             }
-//                         }
-//                     }
-//                     Err("无法解析响应内容".to_string())
-//                 }
-//                 Err(_) => Ok(response_text),
-//             }
-//         })
-//     }
+// Communicate between Client and Model
+#[derive(Debug, Clone)]
+pub struct Communicate<T: ClientApi>{
+    model: DeepseekModel,
+    client: T,
+    conversation: Conversation,
 }
 
+impl<T: ClientApi> Communicate<T> {
+    pub fn communicate(api_key: String, client: T, model: Option<String>, max_tokens: Option<u32>, temperature: Option<f32>) 
+    -> Result<Self, String> {
+        let mut communicate = Self {
+            model: DeepseekModel::new(api_key)
+                .set_model(model.unwrap_or(DEFAULT_MODEL.to_string()))
+                .set_max_tokens(max_tokens.unwrap_or(DEFAULT_MAX_TOKENS))
+                .set_temperature(temperature.unwrap_or(DEFAULT_TEMPERATURE)),
+            client: client,
+            conversation: Conversation::new(),
+        };
+
+        tokio::runtime::Runtime::new().unwrap().block_on(async {
+            'round_loop: loop {
+                let mut retry_count = 0;
+                let max_retries = MAX_RETRIES;
+                let base_delay = BASE_DELAY;
+
+                'retry_loop: loop {
+                    let client_message = communicate.client.response(communicate.conversation.get_messages());
+                    match client_message {
+                        Ok(Some(message)) => {
+                            communicate.conversation.add_message(message);
+                            break 'retry_loop;
+                        }
+                        Ok(None) => {
+                            break 'round_loop;
+                        }
+                        Err(ApiError::Unrecoverable(e)) => {
+                            return Err(format!("Client unrecoverable error: {}", e));
+                        }
+                        Err(ApiError::Recoverable(e)) => {
+                            if retry_count < max_retries {
+                                let delay = base_delay * 2_u32.pow(retry_count);
+                                tokio::time::sleep(delay).await;
+                                retry_count += 1;
+                                continue;
+                            }
+                            return Err(format!("Client recoverable error after {} retries: {}", max_retries, e));
+                        }
+                    }
+                }
+
+                let model_request = communicate.model.generate_request(communicate.conversation.get_messages());
+                let model_message = communicate.model.chat(model_request);
+                match model_message {
+                    Ok(message) => {
+                        communicate.conversation.add_message(Message {
+                            role: "assistant".to_string(),
+                            content: message,
+                        });
+                    }
+                    Err(e) => {
+                        return Err(format!("Model error: {}", e));
+                    }
+                }
+            }
+            Ok(())
+        })?;
+        
+        Ok(communicate)
+    }
+}
