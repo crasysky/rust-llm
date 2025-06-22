@@ -1,4 +1,3 @@
-// examples/hello_sync_threads.rs
 use rust_llm::{Client, ClientApi, Message};
 use std::thread;
 use std::time::Instant;
