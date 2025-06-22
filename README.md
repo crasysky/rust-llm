@@ -87,7 +87,5 @@ Happy coding! 🦀
 ---  
 Made by Shuyang Hou and Tianyi Wu
 
----
-Following is the personal part for the project report:
 
 
