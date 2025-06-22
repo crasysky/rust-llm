@@ -12,3 +12,6 @@ async fn main() {
     println!("request: {}", request_message);
     println!("response: {}", response);
 }
+
+// request: Hello, how are you?
+// response: Hello! I'm just a computer program, so I don't have feelings, but I'm here and ready to help you with anything you need. How about you? How are you doing today? 😊

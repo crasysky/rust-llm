@@ -78,3 +78,9 @@ async fn concurrent_conversations() -> Result<(), Box<dyn std::error::Error>> {
 async fn main() {
     concurrent_conversations().await.unwrap();
 }
+
+// === Concurrent multiple conversations ===
+// Client 1: 4 messages
+// Client 2: 4 messages
+// Client 3: 2 messages
+// time: 58.531016458s
