@@ -42,7 +42,7 @@ pub type ModelResponse = String;
 /// Can be implemented for different models (e.g. Deepseek, OpenAI, etc.)
 pub trait ModelApi {
     /// create a new model
-    fn new(api_key: String) -> Self;
+    fn new(api_key: impl Into<String>) -> Self; 
 
     /// set model
     fn set_model(self, model: String) -> Self;
@@ -90,10 +90,12 @@ pub struct DeepseekModel {
 }
 
 impl ModelApi for DeepseekModel {
-    fn new(api_key: String) -> Self {
+    // fn new(api_key: String) -> Self {
+    fn new(api_key: impl Into<String>) -> Self {
         Self {
             http_client: Client::new(),
-            api_key: api_key.to_string(),
+            // api_key: api_key.to_string(),
+            api_key: api_key.into(),
             base_url: "https://api.deepseek.com/v1/chat/completions".to_string(),
             model: DEFAULT_MODEL.to_string(),
             max_tokens: DEFAULT_MAX_TOKENS,

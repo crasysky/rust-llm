@@ -121,10 +121,20 @@ pub struct Communicate<T: ClientApi>{
 }
 
 impl<T: ClientApi> Communicate<T> {
-    pub fn communicate(client: T, api_key: String, model: Option<String>, max_tokens: Option<u32>, temperature: Option<f32>) 
+    pub fn communicate(
+        client: T, 
+        // api_key: String, 
+        api_key: Option<String>, 
+        model: Option<String>, 
+        max_tokens: Option<u32>, 
+        temperature: Option<f32>) 
     -> impl Future<Output = Result<Self, String>> + Send 
     where T: Send + 'static {
         async move {
+            let api_key = api_key
+                .or_else(|| std::env::var("DEEPSEEK_API_KEY").ok())
+                .ok_or("API key not provided and DEEPSEEK_API_KEY env var not set")?;
+            
             let mut communicate = Self {
                 model: DeepseekModel::new(api_key)
                     .set_model(model.unwrap_or(DEFAULT_MODEL.to_string()))

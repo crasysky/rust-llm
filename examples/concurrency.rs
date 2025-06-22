@@ -1,7 +1,7 @@
 use rust_llm::{Message, ApiError, ClientApi, Communicate};
 use std::time::Instant;
 
-const MY_API_KEY: &str = "sk-b5b8c29284304fa6a1895b8257e5741f";
+// const MY_API_KEY: &str = "sk-b5b8c29284304fa6a1895b8257e5741f";
 
 /// Simple client, used for concurrency example
 struct SimpleClient {
@@ -36,6 +36,9 @@ impl ClientApi for SimpleClient {
 
 /// Example: Concurrent multiple conversations
 async fn concurrent_conversations() -> Result<(), Box<dyn std::error::Error>> {
+    let api_key = std::env::var("DEEPSEEK_API_KEY")
+        .expect("DEEPSEEK_API_KEY environment variable not set");
+
     println!("=== Concurrent multiple conversations ===");
     let start = Instant::now();
     
@@ -49,10 +52,12 @@ async fn concurrent_conversations() -> Result<(), Box<dyn std::error::Error>> {
         .into_iter()
         .map(|client| {
             let client_id = client.id;
+            let api_key = api_key.clone();
             tokio::spawn(async move {
                 let result = Communicate::communicate(
                     client, 
-                    MY_API_KEY.to_string(), 
+                    // MY_API_KEY.to_string(), 
+                    Some(api_key), 
                     None, None, None
                 ).await;
                 

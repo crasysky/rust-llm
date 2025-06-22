@@ -16,13 +16,19 @@ impl ClientApi for MyClient {
     }
 }
 
-const MY_API_KEY: &str = "sk-b5b8c29284304fa6a1895b8257e5741f";
+// const MY_API_KEY: &str = "sk-b5b8c29284304fa6a1895b8257e5741f";
 
 #[tokio::main]
 async fn main() {
+    let api_key = std::env::var("DEEPSEEK_API_KEY")
+        .expect("DEEPSEEK_API_KEY environment variable not set");
+
     let client = MyClient;
 
-    let communicate = Communicate::communicate(client, MY_API_KEY.to_string(), None, None, None).await.unwrap();
+    // let communicate = Communicate::communicate(client, MY_API_KEY.to_string(), None, None, None).await.unwrap();
+    let communicate = Communicate::communicate(client, Some(api_key), None, None, None)
+         .await
+         .unwrap();
 
     println!("{}", communicate.get_messages());
 }
