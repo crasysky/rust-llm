@@ -1,8 +1,6 @@
 use rust_llm::{Message, ApiError, ClientApi, Communicate};
 use std::time::Instant;
 
-// const MY_API_KEY: &str = "sk-b5b8c29284304fa6a1895b8257e5741f";
-
 /// Simple client, used for concurrency example
 struct SimpleClient {
     id: u32,

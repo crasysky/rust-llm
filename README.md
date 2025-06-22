@@ -16,17 +16,33 @@ Prepare to embark on a wild ride through the world of Large Language Models (LLM
 - **Retry Logic Built-In**: No more crying over failed API calls – the retry mechanism (powered by `config.rs`) keeps things rolling.  
 - **Flexible Configuration**: Tweak models, tokens, and temperatures to your heart’s content via `api.rs` and `lib.rs`.  
 
+## 📚 Project Structure  
+Peek under the files:  
+```text
+rust-llm/
+├── Cargo.toml
+├── Cargo.lock
+├── README.md
+├── examples/
+│   ├── hello1.rs
+│   ├── hello2.rs
+│   └── concurrent.rs
+├── src/
+│   ├── api.rs
+│   ├── config.rs
+│   └── lib.rs
+│   └── error.rs
+```
+
+and there is a `llm-test` branch for testing as well.
+
 ## 🚀 Getting Started  
 0. 🔑 API Key Configuration
    Use environment variables
-   Create a `.env` file:
-```bash
-echo "DEEPSEEK_API_KEY=your_api_key_here" > .env:
-
-# For single runs:
-export DEEPSEEK_API_KEY=your_api_key_here
-cargo run --example hello1
-```
+   ```bash
+   # For single run:
+   export DEEPSEEK_API_KEY=your_api_key_here
+   ```
 
 1. Clone this repo like a boss:  
    ```bash
@@ -43,11 +59,18 @@ cargo run --example hello1
    cargo run --example hello1
    ```
 
-## 📚 Project Structure  
-Peek under the hood:  
-- `src/`: `api.rs`, `config.rs`, `error.rs`, and `lib.rs` power the engine.  
-- `examples/`: Play with `hello1.rs`, `hello2.rs`, and `concurrency.rs` to see it in action.  
-- `Cargo.toml`: The recipe for our Rust brew.
+## 🤔 Example results
+Following is the result for `hello1.rs`:
+
+![](assets/hello1.png)
+
+Following is the result for `hello2.rs`:
+
+![](assets/hello2.png)
+
+Following is the result for `concurrency.rs`:
+
+![](assets/concurrency.png)
 
 ## 🎮 Fun Features  
 - **Async All the Way**: Built with `tokio` for non-blocking, lightning-fast performance.  
@@ -62,4 +85,9 @@ You’ll need a Deepseek API key to run the examples. Snag one from their site a
 
 Happy coding! 🦀  
 ---  
-Made with ❤️ by Shuyang Hou and Tianyi Wu
+Made by Shuyang Hou and Tianyi Wu
+
+---
+Following is the personal part for the project report:
+
+

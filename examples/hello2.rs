@@ -16,7 +16,6 @@ impl ClientApi for MyClient {
     }
 }
 
-// const MY_API_KEY: &str = "sk-b5b8c29284304fa6a1895b8257e5741f";
 
 #[tokio::main]
 async fn main() {
