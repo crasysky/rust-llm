@@ -3,21 +3,23 @@
 本项目提供一个用 Rust 实现的 Deepseek LLM 客户端库，支持同步和异步两种调用方式，内置重试、指数退避、并发支持等功能，方便在 Rust 程序中集成 Deepseek AI 服务。
 
 ## 目录结构
+```text
 rust-llm/
 ├── Cargo.toml
 ├── Cargo.lock
 ├── README.md
 ├── examples/
-│ ├── hello.rs
-│ ├── hello_sync.rs
-│ ├── hello_sync_thread.rs
-│ └── concurrent.rs
+│   ├── hello.rs
+│   ├── hello_sync.rs
+│   ├── hello_sync_thread.rs
+│   └── concurrent.rs
 ├── src/
-│ ├── api.rs
-│ ├── config.rs
-│ └── lib.rs
-└── test/
-└── integration_test.rs
+│   ├── api.rs
+│   ├── config.rs
+│   └── lib.rs
+└── tests/
+    └── integration_test.rs
+```
 
 
 - `src/api.rs`：DeepseekModel 的实现，封装 HTTP 请求、重试逻辑、错误类型等。
