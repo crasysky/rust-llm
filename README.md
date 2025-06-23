@@ -53,12 +53,11 @@ and there is a `llm-test` branch for testing as well.
    ```bash
    cargo build
    ```
-3. Pop your API key into `hello1.rs`, `hello2.rs`, `concurrency.rs` (replace that placeholder with your Deepseek key!).  
-4. Run an example and watch the magic unfold:  
+3. Run an example and watch the magic unfold:  
    ```bash
    cargo run --example hello1
    ```
-5. You can also read the docs of the repository:
+4. You can also read the docs of the repository:
    ```bash
    cargo doc --open
    ```
