@@ -11,8 +11,8 @@ Prepare to embark on a wild ride through the world of Large Language Models (LLM
 
 ## 🎨 What Can It Do?  
 - **Talk to LLMs with Ease**: Use `DeepseekModel` to send messages and get responses. Check out `hello1.rs` for a quick taste!  
-- **Concurrent Conversations**: Handle multiple chats at once with our concurrency magic in `concurrency.rs`. 
 - **Custom Client Support**: Implement your own `ClientApi` (see `hello2.rs`) to tailor how your app chats with the world.  
+- **Concurrent Conversations**: Handle multiple chats at once with our concurrency magic in `concurrency.rs`. 
 - **Retry Logic Built-In**: No more crying over failed API calls – the retry mechanism (powered by `config.rs`) keeps things rolling.  
 - **Flexible Configuration**: Tweak models, tokens, and temperatures to your heart’s content via `api.rs` and `lib.rs`.  
 
@@ -57,6 +57,10 @@ and there is a `llm-test` branch for testing as well.
 4. Run an example and watch the magic unfold:  
    ```bash
    cargo run --example hello1
+   ```
+5. You can also read the docs of the repository:
+   ```bash
+   cargo doc --open
    ```
 
 ## 🤔 Example results
